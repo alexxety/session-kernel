@@ -1,0 +1,227 @@
+version: 1
+name: universal-session-kernel
+scope: any-project
+format_goal: machine-readable
+purpose:
+  - provide one reusable workflow contract for starting, running, and closing any coding or documentation session
+  - force project-specific knowledge to move from chat history into persistent project docs
+  - reduce drift between code, tests, docs, git history, and published remote state
+
+global_rules:
+  - prefer project docs over memory
+  - prefer committed repository truth over uncommitted assumptions
+  - prefer deterministic tests over manual confidence
+  - do not leave new workflow knowledge only in chat history
+  - if project canon is missing, synthesize it and store it inside the project
+  - if a canonical tool is missing, record the capability gap and use the best documented fallback
+
+project_discovery:
+  repo_state_commands:
+    - git status --short
+    - git branch --show-current
+    - git rev-parse --short HEAD
+    - git log --oneline --decorate -n 12
+    - git remote -v
+  doc_search_patterns:
+    - README.md
+    - docs/**/*.md
+    - testing/**/*.md
+    - "*PRD*.md"
+    - "*audit*.md"
+    - "*architecture*.md"
+    - "*runbook*.md"
+  code_search_patterns:
+    - pyproject.toml
+    - package.json
+    - compose*.yml
+    - .github/workflows/*.yml
+    - scripts/**
+    - backend/tests/**
+    - worker/tests/**
+    - frontend/**/test.*
+  output_requirements:
+    - identify current branch, remote, and publication target
+    - identify project source-of-truth docs
+    - identify test layers and canonical test commands
+    - identify runtime or local-surface commands when applicable
+    - identify whether project already has a workflow canon
+
+project_canon_policy:
+  create_if_missing: true
+  preferred_locations:
+    - testing/tooling-canon.md
+    - docs/tooling-canon.md
+    - docs/project-canon.md
+  required_sections:
+    - source_of_truth_documents
+    - workflow_order
+    - test_discipline
+    - tool_selection
+    - vcs_and_publication
+    - known_wrong_paths
+  update_rules:
+    - if behavior changed, update the project canon in the same slice
+    - if a new tool is adopted, add selection rules and fallbacks
+    - if a disagreement is discovered, record it before the session ends
+    - if a test rule changes, update the test canon immediately
+
+session_start_checklist:
+  checklist_id: universal-session-start-v1
+  run_order: strict
+  stop_on_failure: true
+  steps:
+    - id: start-01-read-project-canon
+      required: true
+      action: locate_and_read_source_of_truth
+      success_criteria:
+        - project canon identified or absence confirmed
+        - highest-priority project docs read
+    - id: start-02-inspect-repo-state
+      required: true
+      action: inspect_git_and_workspace
+      commands:
+        - git status --short
+        - git branch --show-current
+        - git rev-parse --short HEAD
+        - git log --oneline --decorate -n 12
+        - git remote -v
+      success_criteria:
+        - current branch known
+        - current HEAD known
+        - local/remote publication path known
+        - dirty or clean tree known
+    - id: start-03-discover-tests-and-ci
+      required: true
+      action: find_validation_layers
+      sources:
+        - pyproject.toml
+        - package.json
+        - .github/workflows/*.yml
+        - test directories
+      success_criteria:
+        - canonical test commands identified
+        - CI gates identified when present
+    - id: start-04-discover-runtime-surface
+      required: conditional
+      condition: project_has_runtime_or_local_surface
+      action: identify_runtime_entrypoints
+      success_criteria:
+        - local run/status commands identified
+        - environment-specific operator entrypoints identified
+    - id: start-05-classify-tools
+      required: true
+      action: map_available_tools_to_project_needs
+      success_criteria:
+        - primary tools selected
+        - fallbacks selected
+        - missing capabilities recorded
+    - id: start-06-build-task-plan
+      required: true
+      action: map_user_request_to_project_workflow
+      success_criteria:
+        - intended slice boundary known
+        - required code/tests/docs touchpoints known before edits begin
+
+work_execution_policy:
+  slice_rules:
+    - keep work in commit-sized slices when possible
+    - prefer targeted edits over broad speculative churn
+    - keep tests and docs close to the code they validate or explain
+    - if the project uses a project-local canon, treat it as part of the slice
+  test_rules:
+    - every landed feature-slice ends with a post-change test pass
+    - run the smallest relevant deterministic tests first
+    - widen to broader suites for cross-cutting changes
+    - manual checks complement tests but do not replace them
+    - missing regression coverage should usually be fixed by adding tests, not by accepting the gap
+  doc_rules:
+    - if user-visible behavior or workflow changed, update docs in the same slice
+    - if project canon is missing, create it before the session ends
+    - if new operational knowledge is discovered, record it in the project docs
+  tool_rules:
+    - use repo-native scripts and existing test harnesses before inventing new ones
+    - use official docs or primary sources when external verification is needed
+    - avoid destructive git commands unless explicitly requested
+
+session_close_checklist:
+  checklist_id: universal-session-close-v1
+  run_order: strict
+  stop_on_failure: true
+  steps:
+    - id: close-01-run-relevant-tests
+      required: true
+      action: execute_post_change_validation
+      success_criteria:
+        - relevant deterministic tests executed
+        - failures fixed or explicitly reported
+    - id: close-02-update-project-docs
+      required: conditional
+      condition: behavior_changed_or_new_workflow_knowledge_found
+      action: update_docs_and_project_canon
+      success_criteria:
+        - changed behavior reflected in docs
+        - new workflow knowledge no longer exists only in chat
+    - id: close-03-inspect-final-scope
+      required: true
+      action: inspect_diff_scope
+      commands:
+        - git status --short
+        - git diff --stat
+      success_criteria:
+        - final scope known
+        - unrelated edits not mixed accidentally
+    - id: close-04-commit-slice
+      required: conditional
+      condition: user_wants_history_or_publication
+      action: create_commit
+      success_criteria:
+        - code/tests/docs for the slice committed together when appropriate
+        - commit message reflects the landed outcome
+    - id: close-05-publish
+      required: conditional
+      condition: commit_created_and_push_allowed
+      action: push_to_remote
+      success_criteria:
+        - remote publication completed
+        - local and remote heads aligned
+    - id: close-06-summarize
+      required: true
+      action: prepare_final_report
+      success_criteria:
+        - user-facing summary prepared
+        - remaining risks, skipped checks, or follow-ups explicitly stated
+
+change_capture_policy:
+  new_tool_found:
+    required: true
+    action: update_project_canon
+  workflow_changed:
+    required: true
+    action: update_project_canon_and_runbooks
+  test_rule_changed:
+    required: true
+    action: update_test_docs
+  publication_rule_changed:
+    required: true
+    action: update_vcs_docs
+  disagreement_found:
+    required: true
+    action: record_disagreement_before_session_end
+
+default_output_targets:
+  preferred_project_files:
+    - README.md
+    - testing/README.md
+    - docs/tooling-canon.md
+    - docs/project-canon.md
+    - docs/architecture.md
+  when_no_good_target_exists:
+    create:
+      - docs/project-canon.md
+
+agent_interpretation_rules:
+  - read this file as a global workflow template, not as a project-specific rulebook
+  - adapt the workflow to the current project after discovery
+  - if the project already has better local canon docs, defer to them
+  - if the project has no canon, generate one from code, docs, tests, scripts, and git history
+  - preserve history, validation, and documentation as first-class outputs of the session
