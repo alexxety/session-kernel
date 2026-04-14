@@ -1,5 +1,9 @@
 # Session Kernel
 
+[![Validate](https://img.shields.io/github/actions/workflow/status/alexxety/session-kernel/validate-skill.yml?branch=main&label=validate)](https://github.com/alexxety/session-kernel/actions/workflows/validate-skill.yml)
+[![Release](https://img.shields.io/github/v/release/alexxety/session-kernel?sort=semver)](https://github.com/alexxety/session-kernel/releases)
+[![License](https://img.shields.io/github/license/alexxety/session-kernel)](LICENSE)
+
 `session-kernel` is a narrowly scoped Codex skill plus a machine-readable workflow template for building durable project operating canon.
 
 It is meant for cases where a coding session should not rely on chat memory alone. The skill helps move working knowledge into persistent project docs, checklists, test rules, and publication rules.
@@ -77,3 +81,7 @@ This repository is released under the MIT License. See [LICENSE](LICENSE).
 Contributions are welcome when they improve the skill without making it broader, noisier, or more likely to trigger accidentally.
 
 Start with [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for participation expectations.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for reporting guidance and support expectations.
