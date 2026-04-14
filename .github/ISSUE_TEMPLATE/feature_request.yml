@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a focused improvement to the skill, kernel, or project scaffolding.
+title: "[feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for focused improvements. Keep the request narrow and tied to repository behavior.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What gap or weakness are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What change do you want?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - SKILL.md trigger rules
+        - SESSION_KERNEL.yaml workflow rules
+        - README or public docs
+        - GitHub collaboration scaffolding
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected impact
+      description: Why would this make the repository better?
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks or tradeoffs
+      description: Could this broaden the skill or make it noisier?

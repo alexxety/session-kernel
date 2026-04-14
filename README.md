@@ -71,3 +71,9 @@ The skill is designed to create or update a small set of durable project files, 
 ## License
 
 This repository is released under the MIT License. See [LICENSE](LICENSE).
+
+## Contributing
+
+Contributions are welcome when they improve the skill without making it broader, noisier, or more likely to trigger accidentally.
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for participation expectations.

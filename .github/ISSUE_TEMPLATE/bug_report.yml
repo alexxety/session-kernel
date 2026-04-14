@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a concrete bug in the skill, kernel, or repository docs.
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for concrete breakage, incorrect trigger behavior, or drift between the skill and the kernel.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is wrong?
+      placeholder: The skill triggers too broadly for generic coding tasks.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened in practice?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Prompt, workflow, or steps that reproduce the issue.
+      placeholder: |
+        1. Invoke the skill in ...
+        2. Ask ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: affected_files
+    attributes:
+      label: Affected files
+      description: Which repository files seem involved?
+      placeholder: SKILL.md, SESSION_KERNEL.yaml, README.md
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation or evidence
+      description: Logs, examples, or comparison notes that show the bug.

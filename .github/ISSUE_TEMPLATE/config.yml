@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/alexxety/session-kernel/discussions
+    about: Use Discussions for broad ideas, questions, and design exploration.
